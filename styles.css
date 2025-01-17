@@ -1,0 +1,37 @@
+p {
+    color: white;
+}
+.flex {
+    background-color: rgb(104, 105, 112);
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+}
+
+h2 {
+    color: white;
+    width: 50%;
+}
+#output, textarea {
+    background-color: white;
+    width: 50%;
+    padding: .5rem;
+}
+
+.hbox {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+button {
+    padding: 0.5rem 1rem;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}

@@ -1,0 +1,121 @@
+const input = document.getElementById("input");
+const output = document.getElementById("output");
+const copyButton = document.getElementById("copyButton");
+
+
+function loadDefaultText() {
+    fetch('input-example.txt')  // Accede al archivo directamente desde el repositorio
+        .then(response => response.text())
+        .then(data => {
+            input.value = data;
+
+            // Mostrar el texto procesado en el div de salida
+            output.innerHTML = procesarTexto(input.value);
+        })
+        .catch(error => console.error('Error al cargar el archivo:', error));
+}
+
+window.onload = loadDefaultText;
+
+// Función para aplicar formato en negritas a "V." y "R."
+function aplicarNegritas(text) {
+  return text
+    .replace(/V\./g, "<b>V. </b>")
+    .replace(/R\./g, "<b>R. </b>")
+    .replace(/\nAnt.\n/g, "<b>Ant. </b>")
+    .replace(
+      /Gloria al Padre, y al Hijo, y al Espíritu Santo.\nComo era en el principio, ahora y siempre,\npor los siglos de los siglos. Amén./g,
+      "Gloria al Padre y al Hijo...\n\n"
+    )
+    .replace("Himno", "<b>Himno</b>")
+    .replace("Lectura breve", "<b>\nLectura breve</b>")
+    .replace("Responsorio", "<b>\nResponsorio</b>")
+    .replace("Cántico", "<b>Cántico</b>")
+    .replace('Al final de este cántico no se dice "Gloria al Padre".', "\n")
+    .replace("Ant. 1.\n", "<b>Ant. 1. </b>")
+    .replace("Ant. 2.\n", "<b>\nAnt. 2. </b>")
+    .replace("Ant. 3.\n", "<b>\nAnt. 3. </b>")
+    .replace("Cántico evangélico", "<b>\nCántico evangélico</b>")
+    .replace("Oración conclusiva", "<b>\nOración conclusiva</b>")
+
+    .replace(/(^|\n)(Salmo \d+)/g, (match, prefix, salmo) => {
+      return `${prefix}<b>${salmo}</b>`;
+    });
+}
+
+// Función para eliminar el rango entre "Himno latino" y "Amén"
+function eliminarRango(text, inicio, fin) {
+  const start = text.indexOf(inicio);
+  const end = text.indexOf(fin) + fin.length;
+
+  if (start !== -1 && end !== -1) {
+    return text.slice(0, start) + text.slice(end);
+  } else {
+    console.log("No se encontraron las frases especificadas.");
+    return text;
+  }
+}
+
+// Función para limpiar y procesar el texto
+function procesarTexto(text) {
+  let textoLimpio = eliminarRango(text, "Himno latino", "Amen").replace(
+    "Laudes\nSi las Laudes empiezan con el Invitatorio se omite la siguiente invocación y se dice el himno.\nInvocación inicial\nV.Dios mío, ven en mi auxilio.\nR.Señor, date prisa en socorrerme.\nGloria al Padre, y al Hijo, y al Espíritu Santo.\nComo era en el principio, ahora y siempre,\npor los siglos de los siglos. Amén. Aleluia.",
+    ""
+  );
+  textoLimpio = textoLimpio.slice(0, textoLimpio.indexOf("Conclusión"));
+  textoLimpio =
+    textoLimpio.slice(0, textoLimpio.indexOf("Cántico de Zacarías")) +
+    textoLimpio
+      .slice(textoLimpio.indexOf("Preces"))
+      .replace(
+        "Preces para consagrar a Dios el día y el trabajo",
+        "<b>\nPreces para consagrar a Dios el día y el trabajo</b>"
+      );
+  textoLimpio = eliminarRango(
+    textoLimpio,
+    ", que estás en el cielo",
+    "líbranos del mal."
+  ).replace("\nPadre nuestro", " Padre nuestro...");
+  textoLimpio = aplicarNegritas(textoLimpio).replace(
+    /—\n(.*?)\n/g,
+    (match, contenido) => {
+      return `<i>${contenido}</i>\n`;
+    }
+  );
+  textoLimpio = textoLimpio
+    .replace(/\n/g, "<br>")
+    .replace("Oración dominical", "\n");
+  return textoLimpio;
+}
+
+// Evento de pegar texto en el textarea
+input.addEventListener("input", (event) => {
+  event.preventDefault(); // Evitar que el texto original se pegue automáticamente
+
+  // Obtener el texto pegado desde el portapapeles
+  const text = input.value;
+
+  // Procesar el texto
+  const formattedText = procesarTexto(text);
+
+  // Mostrar el texto procesado en el div de salida
+  output.innerHTML = formattedText;
+});
+
+// Función para copiar el contenido del div de salida al portapapeles
+copyButton.addEventListener("click", () => {
+  // Crear un elemento temporal para copiar el texto sin etiquetas HTML
+  const tempElement = document.createElement("textarea");
+  tempElement.value = output.innerText; // Copia el texto plano (sin formato HTML)
+  document.body.appendChild(tempElement);
+
+  // Seleccionar y copiar el contenido del textarea temporal
+  tempElement.select();
+  document.execCommand("copy");
+
+  // Eliminar el elemento temporal
+  document.body.removeChild(tempElement);
+
+  // Notificar al usuario
+  alert("Texto copiado al portapapeles.");
+});
