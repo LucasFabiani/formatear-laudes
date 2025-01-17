@@ -27,19 +27,19 @@ function aplicarNegritas(text) {
       /Gloria al Padre, y al Hijo, y al Espíritu Santo.\nComo era en el principio, ahora y siempre,\npor los siglos de los siglos. Amén./g,
       "Gloria al Padre y al Hijo...\n\n"
     )
-    .replace("Himno", "<b>Himno</b>")
-    .replace("Lectura breve", "<b>\nLectura breve</b>")
-    .replace("Responsorio", "<b>\nResponsorio</b>")
-    .replace("Cántico", "<b>Cántico</b>")
+    .replace("Himno\n", "<h4>\nHimno</h4>")
+    .replace("Lectura breve\n", "<h4>\nLectura breve</h4>")
+    .replace("Responsorio\n", "<h4>\nResponsorio</h4>")
+    .replace("Cántico\n", "<h4>Cántico</h4>")
     .replace('Al final de este cántico no se dice "Gloria al Padre".', "\n")
-    .replace("Ant. 1.\n", "<b>Ant. 1. </b>")
+    .replace("Ant. 1.\n", "<b>\nAnt. 1. </b>")
     .replace("Ant. 2.\n", "<b>\nAnt. 2. </b>")
     .replace("Ant. 3.\n", "<b>\nAnt. 3. </b>")
-    .replace("Cántico evangélico", "<b>\nCántico evangélico</b>")
-    .replace("Oración conclusiva", "<b>\nOración conclusiva</b>")
+    .replace("Cántico evangélico", "<h4>\nCántico evangélico\n</h4>")
+    .replace("Oración conclusiva\n", "<h4>\nOración conclusiva</h4>")
 
-    .replace(/(^|\n)(Salmo \d+)/g, (match, prefix, salmo) => {
-      return `${prefix}<b>${salmo}</b>`;
+    .replace(/(^|\n)(Salmo \d+)\n/g, (match, prefix, salmo) => {
+      return `${prefix}<h4>${salmo}</h4>`;
     });
 }
 
@@ -59,8 +59,8 @@ function eliminarRango(text, inicio, fin) {
 // Función para limpiar y procesar el texto
 function procesarTexto(text) {
   let textoLimpio = eliminarRango(text, "Himno latino", "Amen").replace(
-    "Laudes\nSi las Laudes empiezan con el Invitatorio se omite la siguiente invocación y se dice el himno.\nInvocación inicial\nV.Dios mío, ven en mi auxilio.\nR.Señor, date prisa en socorrerme.\nGloria al Padre, y al Hijo, y al Espíritu Santo.\nComo era en el principio, ahora y siempre,\npor los siglos de los siglos. Amén. Aleluia.",
-    ""
+    "Laudes\nSi las Laudes empiezan con el Invitatorio se omite la siguiente invocación y se dice el himno.\nInvocación inicial\nV.Dios mío, ven en mi auxilio.\nR.Señor, date prisa en socorrerme.\nGloria al Padre, y al Hijo, y al Espíritu Santo.\nComo era en el principio, ahora y siempre,\npor los siglos de los siglos. Amén. Aleluia.\n",
+    text.indexOf("Himno") != -1 ? "" : "<h4>\nHimno</h4>"
   );
   textoLimpio = textoLimpio.slice(0, textoLimpio.indexOf("Conclusión"));
   textoLimpio =
@@ -68,8 +68,8 @@ function procesarTexto(text) {
     textoLimpio
       .slice(textoLimpio.indexOf("Preces"))
       .replace(
-        "Preces para consagrar a Dios el día y el trabajo",
-        "<b>\nPreces para consagrar a Dios el día y el trabajo</b>"
+        "Preces para consagrar a Dios el día y el trabajo\n",
+        "<h4>\nPreces para consagrar a Dios el día y el trabajo</h4>"
       );
   textoLimpio = eliminarRango(
     textoLimpio,
