@@ -1,7 +1,7 @@
 const input = document.getElementById("input");
 const output = document.getElementById("output");
 const copyButton = document.getElementById("copyButton");
-
+const pasteButton = document.getElementById("pasteButton");
 
 function loadDefaultText() {
     fetch('input-example.txt')  // Accede al archivo directamente desde el repositorio
@@ -119,4 +119,19 @@ input.addEventListener("input", (event) => {
 copyButton.addEventListener("click", () => {
   // Crear un elemento temporal para copiar el texto sin etiquetas HTML
   CopyToClipboard("output");
+});
+
+pasteButton.addEventListener("click", () => {
+navigator.clipboard.readText()
+  .then(text => {
+    const formattedText = procesarTexto(text);
+
+  // Mostrar el texto procesado en el div de salida
+   output.innerHTML = formattedText;
+      input.value = text;
+    console.log('Texto del portapapeles:', text)
+  })
+  .catch(err => {
+    console.error('Error al leer del portapapeles:', err)
+  })
 });
