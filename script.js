@@ -16,7 +16,20 @@ function loadDefaultText() {
 }
 
 window.onload = loadDefaultText;
+function CopyToClipboard(containerid) {
+if (document.selection) { 
+    var range = document.body.createTextRange();
+    range.moveToElementText(document.getElementById(containerid));
+    range.select().createTextRange();
+    document.execCommand("Copy"); 
 
+} else if (window.getSelection) {
+    var range = document.createRange();
+     range.selectNode(document.getElementById(containerid));
+     window.getSelection().addRange(range);
+     document.execCommand("Copy");
+     alert("text copied") 
+}}
 // Función para aplicar formato en negritas a "V." y "R."
 function aplicarNegritas(text) {
   return text
@@ -105,17 +118,5 @@ input.addEventListener("input", (event) => {
 // Función para copiar el contenido del div de salida al portapapeles
 copyButton.addEventListener("click", () => {
   // Crear un elemento temporal para copiar el texto sin etiquetas HTML
-  const tempElement = document.createElement("textarea");
-  tempElement.value = output.innerText; // Copia el texto plano (sin formato HTML)
-  document.body.appendChild(tempElement);
-
-  // Seleccionar y copiar el contenido del textarea temporal
-  tempElement.select();
-  document.execCommand("copy");
-
-  // Eliminar el elemento temporal
-  document.body.removeChild(tempElement);
-
-  // Notificar al usuario
-  alert("Texto copiado al portapapeles.");
+  CopyToClipboard("output");
 });
