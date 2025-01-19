@@ -18,6 +18,7 @@ textarea {
     padding: 1rem;
 }
 #output {
+    font-family: "Ibarra Real Nova";
     background-color: white;
     padding: 1rem;
     column-gap: 1rem;
