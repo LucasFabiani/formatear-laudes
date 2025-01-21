@@ -16,20 +16,25 @@ function loadDefaultText() {
 }
 
 window.onload = loadDefaultText;
-function CopyToClipboard(containerid) {
+const copy = () => {
 if (document.selection) { 
     var range = document.body.createTextRange();
-    range.moveToElementText(document.getElementById(containerid));
+    range.moveToElementText(output);
     range.select().createTextRange();
     document.execCommand("Copy"); 
 
 } else if (window.getSelection) {
     var range = document.createRange();
-     range.selectNode(document.getElementById(containerid));
+     range.selectNode(output);
      window.getSelection().addRange(range);
      document.execCommand("Copy");
-     alert("text copied") 
+     copyButton.innerHTML = "<i class=\"fa fa-check\"></i> Copiado!";
+     setTimeout(()=>{
+        copyButton.innerHTML = "<i class=\"fa fa-copy\"></i> Copiar";
+     }, 2000)
+     
 }}
+
 // Función para aplicar formato en negritas a "V." y "R."
 function aplicarNegritas(text) {
   return text
@@ -116,22 +121,50 @@ input.addEventListener("input", (event) => {
 });
 
 // Función para copiar el contenido del div de salida al portapapeles
-copyButton.addEventListener("click", () => {
-  // Crear un elemento temporal para copiar el texto sin etiquetas HTML
-  CopyToClipboard("output");
+copyButton.addEventListener("click", copy);
+
+const paste = () => {
+  navigator.clipboard.readText()
+    .then(text => {
+      const formattedText = procesarTexto(text);
+  
+    // Mostrar el texto procesado en el div de salida
+     output.innerHTML = formattedText;
+        input.value = text;
+      console.log('Texto del portapapeles:', text)
+    })
+    .catch(err => {
+      console.error('Error al leer del portapapeles:', err)
+    })
+  }
+
+pasteButton.addEventListener("click", paste);
+
+const holder = document.getElementById("holder");
+document.addEventListener('dragover', (e) => {
+    e.preventDefault()
 });
 
-pasteButton.addEventListener("click", () => {
-navigator.clipboard.readText()
-  .then(text => {
-    const formattedText = procesarTexto(text);
+document.addEventListener("drop", (e) => {
+    e.preventDefault()
 
-  // Mostrar el texto procesado en el div de salida
-   output.innerHTML = formattedText;
-      input.value = text;
-    console.log('Texto del portapapeles:', text)
-  })
-  .catch(err => {
-    console.error('Error al leer del portapapeles:', err)
-  })
-});
+    var file = e.dataTransfer.files[0],
+    reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = (e) => {
+        input.value = reader.result.toString();
+        output.innerHTML = procesarTexto(input.value)
+    };
+})
+
+document.addEventListener("keydown", function (e) {
+    var ctrl = e.ctrlKey;
+    
+    if (e.key == 'v' && ctrl) {
+        paste()
+    }
+    else if (e.key == 'c' && ctrl) {
+    copy()
+    }
+    
+     });

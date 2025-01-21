@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,18 +8,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ibarra+Real+Nova:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/4fa21f8d54.js" crossorigin="anonymous"></script>
 </head>
-<body class="flex">
-    <p>En esta aplicación pega el texto directo de la Liturgia de las Horas CEA para procesarlo</p>
-
-    <div class="flex hbox">
-        <h2>Texto</h2>
-        <button id="pasteButton">Pegar del portapapeles</button>
-        <textarea id="input" placeholder="Pega el texto aquí..."></textarea>
-        <button id="copyButton">Copiar</button>
-        <h2>Salida</h2>
-        <div id="output"></div>
-    </div>
+<body>
+    <h1>Formatear Laudes CEA</h1>
+    <textarea id="input" placeholder="Pega el texto aquí..."></textarea>
+    <button id="pasteButton"><i class="fa fa-paste"></i> Pegar</button>
+    <button id="copyButton"><i class="fa fa-copy"></i> Copiar</button>
+    <div id="output"></div>
     
 <script src="script.js" type="module"></script>
 </body>
