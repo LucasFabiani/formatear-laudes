@@ -210,8 +210,6 @@ function process(rawText) {
   hora.oracion_dominical = richText.extract("Oración dominical\nV.", "Padre nuestro, que");
   hora.conclusion = richText.extract("Oración conclusiva\nV.", "R.Amén.");
 
-  upload();
-
   console.log(hora);
 
   richText.text = addSalmoAudios(rawText)
@@ -332,6 +330,7 @@ async function paste() {
     const text = await navigator.clipboard.readText();
     input.value = text;
     output.innerHTML = process(text);
+    upload();
   } catch (err) {
     console.error('Error al leer del portapapeles:', err);
   }
@@ -347,6 +346,7 @@ function handleFileDrop(event) {
       const text = e.target.result;
       input.value = text;
       output.innerHTML = process(text);
+      upload();
     };
     reader.readAsText(file);
   }
