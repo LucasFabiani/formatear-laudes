@@ -142,25 +142,26 @@ async function upload() {
     const iddom = await sha256(hora.oracion_dominical)
     const idcon = await sha256(hora.conclusion)
 
-    await setDoc(doc(db, "salmos", hora.salmo1.numero), {texto: hora.salmo1.letra});
-    await setDoc(doc(db, "salmos", hora.salmo2.numero), {texto: hora.salmo2.letra});
-    await setDoc(doc(db, "antifonas", idant1), {texto: hora.ant1});
-    await setDoc(doc(db, "antifonas", idant2), {texto: hora.ant2});
-    await setDoc(doc(db, "antifonas", idant3), {texto: hora.ant3});
-    await setDoc(doc(db, "antifonas", idantev), {texto: hora.antev});
-    await setDoc(doc(db, "canticos", hora.cantico.cita), {texto: hora.cantico.letra});
-    await setDoc(doc(db, "lecturas_breves", hora.lectura_breve.cita), {texto: hora.lectura_breve.letra});
-    await setDoc(doc(db, "responsorios", idres), {texto: hora.responsorio});
-    await setDoc(doc(db, "preces", idpre), {texto: hora.preces});
-    await setDoc(doc(db, "oraciones_dominicales", iddom), {texto: hora.oracion_dominical});
-    await setDoc(doc(db, "oraciones_conclusivas", idcon), {texto: hora.conclusion});
-    await setDoc(doc(db, "liturgia", obtenerFecha()), {
+    hora.himno.forEach(letra => setDoc(doc(db, "himnos", letra.split('\n')[0]), {texto: letra}));
+    setDoc(doc(db, "salmos", hora.salmo1.numero), {texto: hora.salmo1.letra});
+    setDoc(doc(db, "salmos", hora.salmo2.numero), {texto: hora.salmo2.letra});
+    setDoc(doc(db, "antifonas", idant1), {texto: hora.ant1});
+    setDoc(doc(db, "antifonas", idant2), {texto: hora.ant2});
+    setDoc(doc(db, "antifonas", idant3), {texto: hora.ant3});
+    setDoc(doc(db, "antifonas", idantev), {texto: hora.antev});
+    setDoc(doc(db, "canticos", hora.cantico.cita), {texto: hora.cantico.letra});
+    setDoc(doc(db, "lecturas_breves", hora.lectura_breve.cita), {texto: hora.lectura_breve.letra});
+    setDoc(doc(db, "responsorios", idres), {texto: hora.responsorio});
+    setDoc(doc(db, "preces", idpre), {texto: hora.preces});
+    setDoc(doc(db, "oraciones_dominicales", iddom), {texto: hora.oracion_dominical});
+    setDoc(doc(db, "oraciones_conclusivas", idcon), {texto: hora.conclusion});
+    setDoc(doc(db, "liturgia", obtenerFecha()), {
       ant1: hora.ant1,
       ant2: hora.ant2,
       ant3: hora.ant3,
       antev: hora.antev,
       cantico: hora.cantico.cita,
-      himno: hora.himno,
+      himno: hora.himno.map(letra => letra.split('\n')[0]),
       lectura_breve: hora.lectura_breve.cita,
       memoria: hora.memoria,
       oracion_dominical: iddom,
@@ -188,7 +189,7 @@ function process(rawText) {
 
   hora.memoria = richText.getLine(0);
   hora.tipo = richText.getLine(1).toLowerCase();
-  hora.himno = richText.extract("Himno", "Himno latino");
+  hora.himno = richText.extract("Himno", "Himno latino").split("O bien:").map(letra => letra.replace(/^\s*\w+\s*\[\w+\]\s*/, "").trim());
   hora.ant1 = richText.extract("Ant. 1.", "Salmo");
   hora.ant2 = richText.extract("Ant. 2.", "Cántico");
   hora.ant3 = richText.extract("Ant. 3.", "Salmo");

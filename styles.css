@@ -24,6 +24,18 @@ textarea {
     border: none;
 }
 
+img {
+    width: 100%;
+}
+
+summary {
+    background-color: #a81919;
+    color: #fff;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
 #output {
     background-color: white;
     width: 100%;
@@ -73,5 +85,9 @@ h4 {
     
     body {
         padding: 2rem;
+    }
+
+    img {
+        width: 30%;
     }
 }
