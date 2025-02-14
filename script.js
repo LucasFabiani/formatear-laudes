@@ -27,21 +27,21 @@ const copyButton = document.getElementById("copyButton");
 const pasteButton = document.getElementById("pasteButton");
 
 var hora = {
-  memoria:"",
-  tipo:"",
-  himno:"",
-  ant1:"",
-  salmo1:{numero:"", letra:""},
-  ant2:"",
-  cantico:{cita:"", letra:""},
-  ant3:"",
-  salmo2:{numero:"", letra:""},
-  lectura_breve:{cita:"", letra:""},
-  responsorio:"",
-  antev:"",
-  preces:"",
-  oracion_dominical:"",
-  conclusion:"",
+  memoria: "",
+  tipo: "",
+  himno: "",
+  ant1: "",
+  salmo1: { numero: "", letra: "" },
+  ant2: "",
+  cantico: { cita: "", letra: "" },
+  ant3: "",
+  salmo2: { numero: "", letra: "" },
+  lectura_breve: { cita: "", letra: "" },
+  responsorio: "",
+  antev: "",
+  preces: "",
+  oracion_dominical: "",
+  conclusion: "",
 }
 
 class RichText {
@@ -61,7 +61,7 @@ class RichText {
     const regex = new RegExp(`^${pattern}.*$`, "gm");
     this.text = this.text.replace(regex, (line) => `<br><h4>${line}</h4>`);
     return this;
-}
+  }
 
   // Método para aplicar encabezados h4
   h4All(pattern) {
@@ -71,11 +71,11 @@ class RichText {
   }
 
   // Método para poner en negrita líneas que comiencen con un patrón específico
-    boldLinesStartingWith(pattern) {
-        const regex = new RegExp(`^${pattern}.*$`, "gm");
-        this.text = this.text.replace(regex, (line) => `<b>${line}</b>`);
-        return this;
-    }
+  boldLinesStartingWith(pattern) {
+    const regex = new RegExp(`^${pattern}.*$`, "gm");
+    this.text = this.text.replace(regex, (line) => `<b>${line}</b>`);
+    return this;
+  }
 
   // Método genérico para aplicar reemplazos con una función o texto
   replace(pattern, replacement) {
@@ -99,13 +99,13 @@ class RichText {
   removeRange(startPattern, endPattern, includingEnd = true) {
     const start = this.text.indexOf(startPattern);
     if (start !== -1) {
-        const end = this.text.indexOf(endPattern, start) + (includingEnd ? endPattern.length : 0);
-        if (end > start) {
-            this.text = this.text.slice(0, start) + this.text.slice(end);
-        }
+      const end = this.text.indexOf(endPattern, start) + (includingEnd ? endPattern.length : 0);
+      if (end > start) {
+        this.text = this.text.slice(0, start) + this.text.slice(end);
+      }
     }
     return this;
-}
+  }
 
 
   // Método para obtener el texto procesado
@@ -131,6 +131,19 @@ function obtenerFecha() {
   return `${dia}-${mes}-${año}`;
 }
 
+
+// Función para verificar y escribir solo si no existe
+const writeIfNotExists = async (path, id, data) => {
+  const docRef = doc(db, path, id);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) {
+    await setDoc(docRef, data);
+  } else {
+    console.log(`El documento con ID ${id} ya existe. No se sobrescribirá.`);
+  }
+};
+
+
 async function upload() {
   try {
     const idant1 = await sha256(hora.ant1)
@@ -142,24 +155,26 @@ async function upload() {
     const iddom = await sha256(hora.oracion_dominical)
     const idcon = await sha256(hora.conclusion)
 
-    hora.himno.forEach(letra => setDoc(doc(db, "himnos", letra.split('\n')[0]), {texto: letra}));
-    setDoc(doc(db, "salmos", hora.salmo1.numero), {texto: hora.salmo1.letra});
-    setDoc(doc(db, "salmos", hora.salmo2.numero), {texto: hora.salmo2.letra});
-    setDoc(doc(db, "antifonas", idant1), {texto: hora.ant1});
-    setDoc(doc(db, "antifonas", idant2), {texto: hora.ant2});
-    setDoc(doc(db, "antifonas", idant3), {texto: hora.ant3});
-    setDoc(doc(db, "antifonas", idantev), {texto: hora.antev});
-    setDoc(doc(db, "canticos", hora.cantico.cita), {texto: hora.cantico.letra});
-    setDoc(doc(db, "lecturas_breves", hora.lectura_breve.cita), {texto: hora.lectura_breve.letra});
-    setDoc(doc(db, "responsorios", idres), {texto: hora.responsorio});
-    setDoc(doc(db, "preces", idpre), {texto: hora.preces});
-    setDoc(doc(db, "oraciones_dominicales", iddom), {texto: hora.oracion_dominical});
-    setDoc(doc(db, "oraciones_conclusivas", idcon), {texto: hora.conclusion});
-    setDoc(doc(db, "liturgia", obtenerFecha()), {
-      ant1: hora.ant1,
-      ant2: hora.ant2,
-      ant3: hora.ant3,
-      antev: hora.antev,
+
+    // Aplicando la función a tus datos
+    hora.himno.forEach(letra => writeIfNotExists("himnos", letra.split('\n')[0], { texto: letra }));
+    writeIfNotExists("salmos", hora.salmo1.numero, { texto: hora.salmo1.letra });
+    writeIfNotExists("salmos", hora.salmo2.numero, { texto: hora.salmo2.letra });
+    writeIfNotExists("antifonas", idant1, { texto: hora.ant1 });
+    writeIfNotExists("antifonas", idant2, { texto: hora.ant2 });
+    writeIfNotExists("antifonas", idant3, { texto: hora.ant3 });
+    writeIfNotExists("antifonas", idantev, { texto: hora.antev });
+    writeIfNotExists("canticos", hora.cantico.cita, { texto: hora.cantico.letra });
+    writeIfNotExists("lecturas_breves", hora.lectura_breve.cita, { texto: hora.lectura_breve.letra });
+    writeIfNotExists("responsorios", idres, { texto: hora.responsorio });
+    writeIfNotExists("preces", idpre, { texto: hora.preces });
+    writeIfNotExists("oraciones_dominicales", iddom, { texto: hora.oracion_dominical });
+    writeIfNotExists("oraciones_conclusivas", idcon, { texto: hora.conclusion });
+    writeIfNotExists("liturgia", obtenerFecha(), {
+      ant1: idant1,
+      ant2: idant2,
+      ant3: idant3,
+      antev:idantev,
       cantico: hora.cantico.cita,
       himno: hora.himno.map(letra => letra.split('\n')[0]),
       lectura_breve: hora.lectura_breve.cita,
@@ -170,11 +185,11 @@ async function upload() {
       salmo1: hora.salmo1.numero,
       salmo2: hora.salmo2.numero,
       tipo: hora.tipo
-    })
+    });
     // const docRef = doc(db, "salmos", hora.salmo1.numero);
     // const docSnap = await getDoc(docRef);
     // console.log(docSnap.data());
-    
+
     // const querySnapshot = await getDocs(collection(db, "salmos"));
     // querySnapshot.forEach((doc) => console.log(doc));
     console.log("Documentos agregados!");
@@ -185,6 +200,13 @@ async function upload() {
 
 // Función para procesar el texto
 function process(rawText) {
+  if (rawText.includes("(Oración de la mañana)")) {
+    alert("Texto invalido: Extraelo de la App de la Liturgia de las Horas CEA");
+    return;
+  }
+  if (!rawText.includes("Ant.") || !rawText.includes("Salmo") || !rawText.includes("Amén.")) {
+    alert("Texto invalido");
+  }
   const richText = new RichText(rawText);
 
   hora.memoria = richText.getLine(0);
@@ -193,10 +215,10 @@ function process(rawText) {
   hora.ant1 = richText.extract("Ant. 1.", "Salmo");
   hora.ant2 = richText.extract("Ant. 2.", "Cántico");
   hora.ant3 = richText.extract("Ant. 3.", "Salmo");
-  let aux = richText.extract("Salmo", "Gloria al Padre");
+  let aux = richText.extract("Salmo ", "Gloria al Padre");
   hora.salmo1.numero = aux.slice(0, aux.indexOf("\n"));
   hora.salmo1.letra = aux.slice(aux.indexOf("\n") + 1);
-  aux = richText.extract("Salmo", "Gloria al Padre", richText.text.indexOf("Salmo") + 5);
+  aux = richText.extract("Salmo ", "Gloria al Padre", richText.text.indexOf("Salmo ") + 5);
   hora.salmo2.numero = aux.slice(0, aux.indexOf("\n"));
   hora.salmo2.letra = aux.slice(aux.indexOf("\n") + 1);
   hora.antev = richText.extract("Cántico evangélico\nAnt.", "Cántico de Zacarías");
@@ -249,64 +271,64 @@ let listaSalmos = {};
 
 // Carga los salmos al inicio de la aplicación
 function cargarListaSalmosSincronicamente() {
-    const request = new XMLHttpRequest();
-    request.open("GET", "src/lista-salmos.txt", false); // Llamada sincrónica
-    request.send(null);
+  const request = new XMLHttpRequest();
+  request.open("GET", "src/lista-salmos.txt", false); // Llamada sincrónica
+  request.send(null);
 
-    if (request.status === 200) {
-        const salmos = request.responseText
-            .replace(/'/g, '') // Quitar las comillas simples
-            .split(',') // Dividir por comas
-            .map(item => item.trim()); // Quitar espacios
+  if (request.status === 200) {
+    const salmos = request.responseText
+      .replace(/'/g, '') // Quitar las comillas simples
+      .split(',') // Dividir por comas
+      .map(item => item.trim()); // Quitar espacios
 
-        // Agrupar los salmos por número
-        salmos.forEach(salmo => {
-            const match = salmo.match(/SR_(\d+)/); // Extraer el número del salmo
-            if (match) {
-                const numero = match[1];
-                if (!listaSalmos[numero]) {
-                    listaSalmos[numero] = []; // Crear un array para este número
-                }
-                listaSalmos[numero].push(salmo); // Agregar el salmo al grupo
-            }
-        });
-    } else {
-        console.error("Error al cargar lista de salmos:", request.statusText);
-    }
+    // Agrupar los salmos por número
+    salmos.forEach(salmo => {
+      const match = salmo.match(/SR_(\d+)/); // Extraer el número del salmo
+      if (match) {
+        const numero = match[1];
+        if (!listaSalmos[numero]) {
+          listaSalmos[numero] = []; // Crear un array para este número
+        }
+        listaSalmos[numero].push(salmo); // Agregar el salmo al grupo
+      }
+    });
+  } else {
+    console.error("Error al cargar lista de salmos:", request.statusText);
+  }
 }
 
 
 // Función para agregar audios a los salmos en el texto
 function addSalmoAudios(text) {
-    const regex = /^Salmo (\d+).*$/gm; // Captura el número después de "Salmo"
+  const regex = /^Salmo (\d+).*$/gm; // Captura el número después de "Salmo"
 
-    // Procesar el texto y agregar audios
-    return text.replace(regex, (match, numero) => {
-        if (listaSalmos[numero]) {
-            // Crear etiquetas <audio> para los salmos
-            const audioTags = listaSalmos[numero]
-                .map(
-                    salmo =>
-                        `<audio controls src="https://www.corosanclemente.com.ar/Part/Responsoriales/audio/${salmo}.mp3"></audio><br>`
-                )
-                .join('');
+  // Procesar el texto y agregar audios
+  return text.replace(regex, (match, numero) => {
+    if (listaSalmos[numero]) {
+      // Crear etiquetas <audio> para los salmos
+      const audioTags = listaSalmos[numero]
+        .map(
+          salmo =>
+            `<audio controls src="https://www.corosanclemente.com.ar/Part/Responsoriales/audio/${salmo}.mp3"></audio><br>`
+        )
+        .join('');
 
-            return `${match} <br>${audioTags}`; // Retornar la línea con los audios
-        }
-        return match; // Si no hay salmos, dejar el texto igual
-    });
+      return `${match} <br>${audioTags}`; // Retornar la línea con los audios
+    }
+    return match; // Si no hay salmos, dejar el texto igual
+  });
 }
 
 function loadDefaultText() {
-    fetch('src/input-example.txt')  // Accede al archivo directamente desde el repositorio
-        .then(response => response.text())
-        .then(data => {
-            input.value = data;
+  fetch('src/input-example.txt')  // Accede al archivo directamente desde el repositorio
+    .then(response => response.text())
+    .then(data => {
+      input.value = data;
 
-            // Mostrar el texto procesado en el div de salida
-            output.innerHTML = process(input.value);
-        })
-        .catch(error => console.error('Error al cargar el archivo:', error));
+      // Mostrar el texto procesado en el div de salida
+      output.innerHTML = process(input.value);
+    })
+    .catch(error => console.error('Error al cargar el archivo:', error));
 }
 
 // Copiar al portapapeles
@@ -368,18 +390,18 @@ document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.key === 'c') copy();
 });
 
-function play(){
+function play() {
   const audios = document.querySelectorAll("audio");
-  
-  function playAudio(index = 0) {
-      if (index < audios.length) {
-          const audio = audios[index];
-          audio.play();
 
-          audio.onended = ()=>{
-              playAudio(index + 1);
-          };
-      }
+  function playAudio(index = 0) {
+    if (index < audios.length) {
+      const audio = audios[index];
+      audio.play();
+
+      audio.onended = () => {
+        playAudio(index + 1);
+      };
+    }
   }
 
   playAudio();
